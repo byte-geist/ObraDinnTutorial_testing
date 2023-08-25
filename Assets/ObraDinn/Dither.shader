@@ -131,14 +131,18 @@ Shader "Effects/Dither"
             float ditherLum = (col.a < 0.5) ? cubeProject(_Noise, _Noise_TexelSize.xy, dir) :
                 cubeProject(_Dither, _Dither_TexelSize.xy, dir);
 
-            float2 edgeData = edge(i.uv.xy, _MainTex_TexelSize.xy * 2.0f);
+            // ditherLum = (lum < 0.6f) ? ditherLum * 0.6f : ditherLum;
+            ditherLum = ditherLum * 0.6f;
 
+            float2 edgeData = edge(i.uv.xy, _MainTex_TexelSize.xy * 1.5f);
             lum = (edgeData.y < _Threshold) ? lum : ((edgeData.x < 0.1f) ? 1.0f : 0.0f);
+            //lum = (edgeData.y < 0.8f) ? 1.0f : 0.0f;
 
             float ramp = (lum <= clamp(ditherLum, 0.1f, 0.9f)) ? 0.1f : 0.9f;
-            //float3 output = tex2D(_ColorRamp, float2(ramp, 0.5f));
-            float3 output = float4(1,1,1,1) * ramp;
+            float3 output = tex2D(_ColorRamp, float2(ramp, 0.9f));
+            // float3 output = float4(1,1,1,1) * ramp;
 
+            if(lum < .2f) return fixed4(0, 0, 0, 1);
             //return col;
             return float4(output, 1.0f);
         }
